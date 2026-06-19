@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>DIGITRON | JovanOps</title>
+  <meta name="description" content="A simple web calculator demo by JovanOps, rebuilt from a desktop calculator concept into a live browser-based project." />
+
+  <style>
+    :root {
+      --bg: #070b16;
+      --card: rgba(15, 23, 42, 0.82);
+      --border: rgba(148, 163, 184, 0.18);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --danger: #fb7185;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        radial-gradient(circle at top left, rgba(56,189,248,0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(124,58,237,0.16), transparent 38%),
+        var(--bg);
+      background-size: 80px 80px, 80px 80px, auto, auto;
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .shell {
+      width: min(440px, 100%);
+    }
+
+    .brand {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .brand a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 900;
+      font-size: 1.4rem;
+      letter-spacing: -0.04em;
+    }
+
+    .brand span {
+      color: var(--blue);
+    }
+
+    .brand p {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .calculator {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.58));
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 24px;
+      box-shadow: 0 30px 90px rgba(2, 132, 199, 0.16);
+      backdrop-filter: blur(18px);
+    }
+
+    .screen {
+      min-height: 108px;
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 22px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .history {
+      color: var(--muted);
+      font-size: 0.9rem;
+      min-height: 22px;
+      word-break: break-all;
+    }
+
+    .output {
+      font-size: clamp(2rem, 8vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      min-height: 64px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.84);
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.55);
+      color: var(--blue);
+      box-shadow: 0 16px 40px rgba(56, 189, 248, 0.10);
+    }
+
+    .op {
+      background: rgba(56, 189, 248, 0.12);
+      color: #bae6fd;
+    }
+
+    .danger {
+      background: rgba(251, 113, 133, 0.12);
+      color: #fecdd3;
+    }
+
+    .equal {
+      grid-column: span 2;
+      background: var(--blue);
+      color: #020617;
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .links a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="shell">
+    <div class="brand">
+      <a href="https://jovanops.github.io/">Jovan<span>Ops</span></a>
+      <p>DIGITRON — desktop calculator concept rebuilt as a live browser demo.</p>
+    </div>
+
+    <section class="calculator">
+      <div class="screen">
+        <div class="history" id="history"></div>
+        <div class="output" id="output">0</div>
+      </div>
+
+      <div class="grid">
+        <button class="danger" data-action="clear">C</button>
+        <button class="danger" data-action="delete">DEL</button>
+        <button class="op" data-value="%">%</button>
+        <button class="op" data-value="/">÷</button>
+
+        <button data-value="7">7</button>
+        <button data-value="8">8</button>
+        <button data-value="9">9</button>
+        <button class="op" data-value="*">×</button>
+
+        <button data-value="4">4</button>
+        <button data-value="5">5</button>
+        <button data-value="6">6</button>
+        <button class="op" data-value="-">−</button>
+
+        <button data-value="1">1</button>
+        <button data-value="2">2</button>
+        <button data-value="3">3</button>
+        <button class="op" data-value="+">+</button>
+
+        <button class="zero" data-value="0">0</button>
+        <button data-value=".">.</button>
+        <button class="equal" data-action="calculate">=</button>
+      </div>
+    </section>
+
+    <p class="note">
+      Static HTML, CSS and JavaScript calculator deployed live through Vercel.
+    </p>
+
+    <div class="links">
+      <a href="https://github.com/JovanOps/DIGITRON" target="_blank" rel="noopener">GitHub Repo →</a>
+      <a href="https://jovanops.github.io/" target="_blank" rel="noopener">Portfolio →</a>
+    </div>
+  </main>
+
+  <script>
+    const output = document.getElementById("output");
+    const history = document.getElementById("history");
+
+    let expression = "";
+
+    function updateScreen() {
+      output.textContent = expression || "0";
+    }
+
+    function calculate() {
+      try {
+        if (!expression) return;
+
+        const cleanExpression = expression.replace(/%/g, "/100");
+        const result = Function('"use strict"; return (' + cleanExpression + ')')();
+
+        history.textContent = expression + " =";
+        expression = Number.isInteger(result) ? String(result) : String(Number(result.toFixed(8)));
+        updateScreen();
+      } catch {
+        output.textContent = "Error";
+        expression = "";
+      }
+    }
+
+    document.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.value;
+        const action = button.dataset.action;
+
+        if (action === "clear") {
+          expression = "";
+          history.textContent = "";
+          updateScreen();
+          return;
+        }
+
+        if (action === "delete") {
+          expression = expression.slice(0, -1);
+          updateScreen();
+          return;
+        }
+
+        if (action === "calculate") {
+          calculate();
+          return;
+        }
+
+        expression += value;
+        updateScreen();
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const allowed = "0123456789+-*/.%";
+
+      if (allowed.includes(event.key)) {
+        expression += event.key;
+        updateScreen();
+      }
+
+      if (event.key === "Enter") calculate();
+
+      if (event.key === "Backspace") {
+        expression = expression.slice(0, -1);
+        updateScreen();
+      }
+
+      if (event.key === "Escape") {
+        expression = "";
+        history.textContent = "";
+        updateScreen();
+      }
+    });
+  </script>
+</body>
+</html>
